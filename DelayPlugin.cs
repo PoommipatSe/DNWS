@@ -20,7 +20,7 @@ namespace DNWS
     {
       HTTPResponse response = null;
       String[] parts = Regex.Split(request.Filename, "[?]");
-      Int32 delay = 0;
+      Int32 delay = 2000;
       if (parts.Length > 1) {
         try {
           delay = Int32.Parse(parts[1]);
