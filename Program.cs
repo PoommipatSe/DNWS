@@ -260,8 +260,20 @@ namespace DNWS
         /// Server starting point
         /// </summary>
         
+        public void ThreadPoolCallback(Object threadContext)
+                {
+                    int threadIndex = (int)threadContext;
+                    Console.WriteLine("thread {0} started...", threadIndex);  
+                    HTTPProcessor hp = (HTTPProcessor) threadContext;
+                    hp.Process();
+                    Console.WriteLine("thread {0} result calculated...", threadIndex);
+                }
+       
         public void Start()
         {
+            string modeSwitch = Program.Configuration["ThreadMode"];
+            Console.WriteLine("This server mode is : "+modeSwitch);
+
             while (true) {
                 try
                 {
@@ -289,14 +301,37 @@ namespace DNWS
                     // Get one, show some info
                     _parent.Log("Client accepted:" + clientSocket.RemoteEndPoint.ToString());
                     HTTPProcessor hp = new HTTPProcessor(clientSocket, _parent);
+                    /* 
+                    switch (modeSwitch)
+                    {
+                        case "single":
+                            Console.WriteLine("Single Thread web appeared!");
+                            hp.Process();
+                            break;
+                        case "multi":
+                            Console.WriteLine("Multi Thread web appeared!");
+                            Thread thread = new Thread(() => hp.Process());
+                            thread.Start();
+                            break;
+                        case "threadpool":
+                            Console.WriteLine("Thread Pool web appeared!");
+                            ThreadPool.QueueUserWorkItem(hp.Process(),10);
+                            break;
+                        default:
+                            Console.WriteLine("Default on Single Thread");
+                            break;
+                    }*/
                     // Single thread
-                    hp.Process();                    
+                    //hp.Process();                    
                     // End single thread
                     
                     // Multi thread
                     //Thread thread = new Thread(new ThreadStart(hp.Process()));
                     //Thread thread = new Thread(() => hp.Process());
-                    //thread.Start();                     
+                    //thread.Start();
+
+                    //Thread Pool
+                    ThreadPool.QueueUserWorkItem(ThreadProc);     
 
                 }
                 catch (Exception ex)
@@ -304,6 +339,7 @@ namespace DNWS
                     _parent.Log("Server starting error: " + ex.Message + "\n" + ex.StackTrace);
 
                 }
+                
             }
 
         }
