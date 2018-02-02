@@ -262,11 +262,8 @@ namespace DNWS
         
         public void ThreadPoolCallback(Object threadContext)
                 {
-                    int threadIndex = (int)threadContext;
-                    Console.WriteLine("thread {0} started...", threadIndex);  
                     HTTPProcessor hp = (HTTPProcessor) threadContext;
                     hp.Process();
-                    Console.WriteLine("thread {0} result calculated...", threadIndex);
                 }
        
         public void Start()
@@ -301,26 +298,27 @@ namespace DNWS
                     // Get one, show some info
                     _parent.Log("Client accepted:" + clientSocket.RemoteEndPoint.ToString());
                     HTTPProcessor hp = new HTTPProcessor(clientSocket, _parent);
-                    /* 
+                     
                     switch (modeSwitch)
                     {
                         case "single":
-                            Console.WriteLine("Single Thread web appeared!");
+                            _parent.Log("Single Thread web appeared!");
                             hp.Process();
                             break;
                         case "multi":
-                            Console.WriteLine("Multi Thread web appeared!");
+                            _parent.Log("Multi Thread web appeared!");                            
                             Thread thread = new Thread(() => hp.Process());
                             thread.Start();
                             break;
                         case "threadpool":
-                            Console.WriteLine("Thread Pool web appeared!");
-                            ThreadPool.QueueUserWorkItem(hp.Process(),10);
+                            _parent.Log("ThreadPool web appeared!");
+                            ThreadPool.QueueUserWorkItem(ThreadPoolCallback, hp);     
                             break;
                         default:
-                            Console.WriteLine("Default on Single Thread");
+                            _parent.Log("Single Thread web appeared!");
+                            hp.Process();
                             break;
-                    }*/
+                    }
                     // Single thread
                     //hp.Process();                    
                     // End single thread
@@ -331,7 +329,7 @@ namespace DNWS
                     //thread.Start();
 
                     //Thread Pool
-                    ThreadPool.QueueUserWorkItem(ThreadProc);     
+                    //ThreadPool.QueueUserWorkItem(ThreadPoolCallback, hp);     
 
                 }
                 catch (Exception ex)
