@@ -2,6 +2,7 @@
     "DocumentRoot": ".",
     "Port": "8080",
     "ThreadMode": "threadpool",
+    "poolSize": 10,
     "Plugins" : [
         {
             "Path" : "stat",

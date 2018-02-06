@@ -269,8 +269,9 @@ namespace DNWS
         public void Start()
         {
             string modeSwitch = Program.Configuration["ThreadMode"];
+            int maxPoolSize = Int32.Parse(Program.Configuration["poolSize"]);
+            ThreadPool.SetMaxThreads(maxPoolSize,maxPoolSize);
             Console.WriteLine("This server mode is : "+modeSwitch);
-
             while (true) {
                 try
                 {
@@ -312,25 +313,13 @@ namespace DNWS
                             break;
                         case "threadpool":
                             _parent.Log("ThreadPool web appeared!");
-                            ThreadPool.QueueUserWorkItem(ThreadPoolCallback, hp);     
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(ThreadPoolCallback), hp); 
                             break;
                         default:
                             _parent.Log("Single Thread web appeared!");
                             hp.Process();
                             break;
                     }
-                    // Single thread
-                    //hp.Process();                    
-                    // End single thread
-                    
-                    // Multi thread
-                    //Thread thread = new Thread(new ThreadStart(hp.Process()));
-                    //Thread thread = new Thread(() => hp.Process());
-                    //thread.Start();
-
-                    //Thread Pool
-                    //ThreadPool.QueueUserWorkItem(ThreadPoolCallback, hp);     
-
                 }
                 catch (Exception ex)
                 {
