@@ -14,3 +14,5 @@ COPY --from=build-env /app/out ./
 COPY ./config.json /app/out
 COPY ./index.html /app/out
 ENTRYPOINT [ "/app/DNWS" ]
+
+expose  80
