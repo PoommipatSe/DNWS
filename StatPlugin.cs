@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ServiceStack.Redis;
+
 
 namespace DNWS
 {
   class StatPlugin : IPlugin
   {
+
     protected static Dictionary<String, int> statDictionary = null;
     public StatPlugin()
     {
+      
       if (statDictionary == null)
       {
         statDictionary = new Dictionary<String, int>();
@@ -29,6 +33,7 @@ namespace DNWS
     }
     public virtual HTTPResponse GetResponse(HTTPRequest request)
     {
+      
       HTTPResponse response = null;
       StringBuilder sb = new StringBuilder();
       sb.Append("<html><body><h1>Stat:</h1>");
@@ -40,11 +45,15 @@ namespace DNWS
       response = new HTTPResponse(200);
       response.Body = Encoding.UTF8.GetBytes(sb.ToString());
       return response;
+      
     }
 
     public HTTPResponse PostProcessing(HTTPResponse response)
     {
       throw new NotImplementedException();
     }
+      
+      
   }
 }
+  
