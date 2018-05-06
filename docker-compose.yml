@@ -14,5 +14,12 @@ services:
       - "8080:8080"
     networks:
       - webnet
+    environment:
+      - redis=true
+
+  redis:
+    image: redis
+    networks:
+      - webnet
 networks: 
   webnet:
