@@ -1,7 +1,7 @@
 version: "3"
 services:
   web:
-    image: poom17345/hw3:extendpart
+    image: poom17345/hw3:part03
     deploy:
       replicas: 2
       resources:

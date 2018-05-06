@@ -10,10 +10,20 @@ namespace DNWS
   {
 
     protected static Dictionary<String, int> statDictionary = null;
+    protected static RedisManagerPool redisManager = null;
     public StatPlugin()
     {
       
-      if (statDictionary == null)
+      string redisAttach = Environment.GetEnvironmentVariable("redis"); //redis status
+
+      if (redisAttach != null){ //using redis?
+        if (redisManager == null){ //does redis manager exists?
+          redisManager = new RedisManagerPool("redis:6969"); // create one
+          //statDictionary = new Dictionary<String, int>(); // create dict
+
+        }
+      }
+      else if (statDictionary == null)
       {
         statDictionary = new Dictionary<String, int>();
 
@@ -22,7 +32,12 @@ namespace DNWS
 
     public void PreProcessing(HTTPRequest request)
     {
-      if (statDictionary.ContainsKey(request.Url))
+      if (redisManager != null){ //redis manager exists
+        using (var client = redisManager.GetClient()){
+          client.IncrementValue(request.Url);
+        }
+      }
+      else if (statDictionary.ContainsKey(request.Url)) //if not using redis, the plugin still works
       {
         statDictionary[request.Url] = (int)statDictionary[request.Url] + 1;
       }
@@ -37,7 +52,15 @@ namespace DNWS
       HTTPResponse response = null;
       StringBuilder sb = new StringBuilder();
       sb.Append("<html><body><h1>Stat:</h1>");
-      foreach (KeyValuePair<String, int> entry in statDictionary)
+      if (redisManager != null){ //redis manager exists
+        using (var client = redisManager.GetClient()){
+          List<string> keys = client.GetAllKeys();
+          foreach (string key in keys){
+            sb.Append(key + ": " + client.GetValue(key) + "<br />");
+          }
+        }
+      }
+      else foreach (KeyValuePair<String, int> entry in statDictionary)
       {
         sb.Append(entry.Key + ": " + entry.Value.ToString() + "<br />");
       }
